@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cuestionario — Unidad 1: Simulación</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0e0f14;
+    --surface: #161820;
+    --card: #1c1e28;
+    --border: #2a2d3e;
+    --accent: #6c8cff;
+    --accent2: #a78bfa;
+    --correct: #34d399;
+    --wrong: #f87171;
+    --text: #e8eaf6;
+    --muted: #7b7fa8;
+    --mono: 'JetBrains Mono', monospace;
+    --sans: 'Sora', sans-serif;
+  }
+
+  body {
+    font-family: var(--sans);
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 2rem 1rem 4rem;
+  }
+
+  header {
+    max-width: 760px;
+    margin: 0 auto 3rem;
+    border-left: 3px solid var(--accent);
+    padding-left: 1.25rem;
+  }
+
+  header .tag {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 2px;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 0.5rem;
+  }
+
+  header h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    line-height: 1.2;
+    background: linear-gradient(135deg, #e8eaf6 30%, var(--accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  header p {
+    margin-top: 0.5rem;
+    color: var(--muted);
+    font-size: 0.9rem;
+  }
+
+  .progress-bar {
+    max-width: 760px;
+    margin: 0 auto 2.5rem;
+    background: var(--border);
+    border-radius: 999px;
+    height: 4px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    border-radius: 999px;
+    transition: width 0.4s ease;
+    width: 0%;
+  }
+
+  .counter {
+    max-width: 760px;
+    margin: 0 auto 1.5rem;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--muted);
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .question-card {
+    max-width: 760px;
+    margin: 0 auto 1.5rem;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 1.75rem;
+    transition: border-color 0.2s;
+  }
+
+  .question-card:hover { border-color: #3a3d58; }
+
+  .q-number {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: 1px;
+    margin-bottom: 0.6rem;
+  }
+
+  .q-text {
+    font-size: 1rem;
+    font-weight: 600;
+    line-height: 1.55;
+    margin-bottom: 1.25rem;
+  }
+
+  .options {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+
+  .option {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    text-align: left;
+    color: var(--text);
+    font-family: var(--sans);
+    width: 100%;
+  }
+
+  .option:hover:not(:disabled) {
+    border-color: var(--accent);
+    background: #1e2035;
+  }
+
+  .option input[type="radio"],
+  .option input[type="checkbox"] {
+    margin-top: 2px;
+    accent-color: var(--accent);
+    flex-shrink: 0;
+    width: 16px;
+    height: 16px;
+  }
+
+  .option.selected { border-color: var(--accent); background: #1a1d35; }
+  .option.correct  { border-color: var(--correct); background: #0d2620; color: var(--correct); }
+  .option.wrong    { border-color: var(--wrong);   background: #2a1010; color: var(--wrong); }
+  .option.reveal-correct { border-color: var(--correct); background: #0d2620; }
+
+  .feedback {
+    margin-top: 1rem;
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    line-height: 1.5;
+    display: none;
+  }
+  .feedback.show { display: block; }
+  .feedback.ok  { background: #0d2620; color: var(--correct); border-left: 3px solid var(--correct); }
+  .feedback.err { background: #2a1010; color: var(--wrong);   border-left: 3px solid var(--wrong); }
+
+  .btn-check {
+    margin-top: 1.1rem;
+    padding: 0.55rem 1.25rem;
+    border-radius: 8px;
+    border: 1px solid var(--accent);
+    background: transparent;
+    color: var(--accent);
+    font-family: var(--sans);
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+  }
+  .btn-check:hover { background: var(--accent); color: #fff; }
+  .btn-check:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  .results {
+    max-width: 760px;
+    margin: 2.5rem auto 0;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 2rem;
+    text-align: center;
+    display: none;
+  }
+  .results.show { display: block; }
+  .results .score-num {
+    font-size: 4rem;
+    font-weight: 700;
+    font-family: var(--mono);
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .results p { color: var(--muted); margin-top: 0.5rem; font-size: 0.95rem; }
+  .btn-retry {
+    margin-top: 1.5rem;
+    padding: 0.7rem 2rem;
+    border-radius: 10px;
+    border: none;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    color: #fff;
+    font-family: var(--sans);
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="tag">SIM — Unidad 1</div>
+  <h1>Cuestionario de Simulación</h1>
+  <p>Seleccioná la/s respuesta/s correctas y verificá cada pregunta individualmente.</p>
+</header>
+
+<div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+<div class="counter"><span id="counterText">Pregunta 0 / 20 verificadas</span><span id="scoreText">Puntaje: 0</span></div>
+
+<div id="quiz"></div>
+<div class="results" id="results">
+  <div class="score-num" id="finalScore"></div>
+  <p id="finalMsg"></p>
+  <button class="btn-retry" onclick="location.reload()">Volver a intentar</button>
+</div>
+
+<script>
+const questions = [
+  {
+    q: "¿Qué es un modelo?",
+    type: "radio",
+    options: [
+      "Una representación exacta de la realidad",
+      "Una representación de la realidad (esquemas, grafos, dibujos, maquetas, modelos físicos o matemáticos)",
+      "Un programa de computadora que simula fenómenos",
+      "Un conjunto de datos estadísticos"
+    ],
+    answer: [1],
+    feedback: "Un modelo es una representación de la realidad. Puede tomar la forma de esquemas, grafos, dibujos, maquetas, modelos físicos o modelos matemáticos."
+  },
+  {
+    q: "¿Cuál es la definición simple de 'simular'?",
+    type: "radio",
+    options: [
+      "Resolver problemas con ecuaciones diferenciales",
+      "Hacer evolucionar un modelo para observar su comportamiento a través del tiempo",
+      "Construir maquetas físicas de sistemas reales",
+      "Aplicar métodos estadísticos a datos reales"
+    ],
+    answer: [1],
+    feedback: "Simular es hacer evolucionar un modelo para observar su comportamiento a través del tiempo."
+  },
+  {
+    q: "Según la definición dada en el material, ¿qué es la Simulación?",
+    type: "radio",
+    options: [
+      "Técnica para construir maquetas físicas de procesos industriales",
+      "El proceso de diseñar y desarrollar un modelo computarizado de un sistema o proceso, y conducir experimentos para entender su comportamiento o evaluar estrategias (Shannon)",
+      "Método exclusivamente usado en ciencias naturales",
+      "Proceso de recolección de datos reales de un sistema"
+    ],
+    answer: [1],
+    feedback: "Según Robert E. Shannon, la simulación es el proceso de diseñar y desarrollar un modelo computarizado de un sistema o proceso, y conducir experimentos con ese modelo con el propósito de entender su comportamiento o evaluar estrategias."
+  },
+  {
+    q: "Según Maisel y Gnugnoli, la simulación es:",
+    type: "radio",
+    options: [
+      "Una técnica cualitativa para analizar sistemas sociales",
+      "Un método de optimización matemática",
+      "Una técnica numérica para realizar experimentos en una computadora digital, involucrando modelos matemáticos y lógicos que describen el comportamiento de sistemas a través de largos períodos de tiempo",
+      "Un proceso de validación de datos estadísticos"
+    ],
+    answer: [2],
+    feedback: "Maisel y Gnugnoli definen la simulación como una técnica numérica para realizar experimentos en una computadora digital, que involucra modelos matemáticos y lógicos que describen el comportamiento de sistemas (negocios, económicos, sociales, biológicos, físicos o químicos) a través de largos períodos de tiempo."
+  },
+  {
+    q: "¿Cuáles son los objetivos de la simulación? (seleccioná todos los correctos)",
+    type: "checkbox",
+    options: [
+      "Describir el comportamiento de sistemas",
+      "Postular teorías o hipótesis que expliquen el comportamiento observado",
+      "Usar teorías para predecir comportamientos futuros",
+      "Encontrar siempre la solución óptima al problema"
+    ],
+    answer: [0,1,2],
+    feedback: "Los objetivos son: describir el comportamiento, postular teorías/hipótesis y predecir comportamientos futuros. La simulación NO garantiza soluciones óptimas."
+  },
+  {
+    q: "¿Cuáles son las distintas formas de estudiar un sistema?",
+    type: "checkbox",
+    options: [
+      "Experimentar con el sistema real",
+      "Usar un modelo físico",
+      "Usar un modelo matemático con solución analítica",
+      "Usar un modelo matemático con simulación",
+      "Usar únicamente estadística descriptiva"
+    ],
+    answer: [0,1,2,3],
+    feedback: "Las formas son: experimentar con el sistema real, o experimentar con un modelo (físico o matemático). El modelo matemático puede resolverse analíticamente o mediante simulación."
+  },
+  {
+    q: "¿Cuáles son algunas clasificaciones de sistemas?",
+    type: "checkbox",
+    options: [
+      "Cerrados / Abiertos",
+      "Naturales / Artificiales",
+      "Estables / Inestables",
+      "Estocásticos / Determinísticos",
+      "Lineales / No lineales",
+      "Terminantes / No terminantes",
+      "Analógicos / Digitales"
+    ],
+    answer: [0,1,2,3,4,5],
+    feedback: "El material menciona: Cerrados/Abiertos, Naturales/Artificiales, Estables/Inestables, Estocásticos/Determinísticos, Lineales/No lineales, y Terminantes/No terminantes. 'Analógicos/Digitales' no es una clasificación del material."
+  },
+  {
+    q: "¿Cómo se caracterizan los sistemas discretos?",
+    type: "checkbox",
+    options: [
+      "Los cambios se manifiestan en momentos discretos (t0, t1, t2, …)",
+      "Los cambios no tienen por qué ser equidistantes en el tiempo",
+      "Entre dos eventos no hay cambios en las variables",
+      "Son sistemas determinísticos modelables con ecuaciones diferenciales",
+      "Son sistemas estocásticos donde intervienen variables aleatorias"
+    ],
+    answer: [0,1,2,4],
+    feedback: "Los sistemas discretos: cambian en momentos discretos no necesariamente equidistantes, no cambian entre eventos, y son estocásticos/probabilísticos. Las ecuaciones diferenciales corresponden a sistemas continuos."
+  },
+  {
+    q: "¿Cómo se caracterizan los sistemas continuos?",
+    type: "radio",
+    options: [
+      "Los cambios se miden continuamente y son sistemas determinísticos modelables con ecuaciones diferenciales",
+      "Los cambios ocurren en instantes discretos y son estocásticos",
+      "No pueden ser modelados matemáticamente",
+      "Son sistemas que no alcanzan un estado estable"
+    ],
+    answer: [0],
+    feedback: "Los sistemas continuos son aquellos en los que los cambios se miden continuamente. Son sistemas determinísticos que se pueden modelar con ecuaciones diferenciales (si se conoce cuáles son las aplicables)."
+  },
+  {
+    q: "Según la clasificación de modelos, ¿cuáles son los tipos principales?",
+    type: "checkbox",
+    options: [
+      "Discretos (probabilísticos)",
+      "Continuos (determinísticos)",
+      "Estocásticos basados en inteligencia artificial",
+      "Estáticos (no cambian su estado interno)",
+      "Dinámicos"
+    ],
+    answer: [0,1,3,4],
+    feedback: "La clasificación del material: Discretos (probabilísticos) → Estáticos o Dinámicos; Continuos (determinísticos) → Basados en leyes de la naturaleza o en la observación."
+  },
+  {
+    q: "¿Qué son los modelos basados en leyes de la naturaleza? Seleccioná ejemplos correctos.",
+    type: "checkbox",
+    options: [
+      "Modelos térmicos",
+      "Modelos mecánicos",
+      "Modelos químicos",
+      "Modelos electromagnéticos",
+      "Modelos económicos",
+      "Modelos ecológicos"
+    ],
+    answer: [0,1,2,3],
+    feedback: "Los basados en leyes de la naturaleza son: térmicos, mecánicos, químicos y electromagnéticos. Los económicos y ecológicos pertenecen a 'basados en la observación'."
+  },
+  {
+    q: "¿Cuáles son ejemplos de modelos 'caja blanca'?",
+    type: "checkbox",
+    options: [
+      "Circuitos eléctricos",
+      "Mecánicos",
+      "Fisiológicos",
+      "Control aeroespacial",
+      "Ecológicos",
+      "Meteorológicos"
+    ],
+    answer: [0,1,2,3],
+    feedback: "Los modelos caja blanca (leyes conocidas) incluyen circuitos eléctricos, mecánicos, fisiológicos y control aeroespacial. Ecológicos y meteorológicos son más del lado 'caja negra'."
+  },
+  {
+    q: "¿Cuáles son ventajas de la simulación? (seleccioná todas las correctas)",
+    type: "checkbox",
+    options: [
+      "Permite estimar medidas de desempeño bajo diferentes escenarios",
+      "Es útil cuando no hay formulación matemática",
+      "Otorga control sobre condiciones experimentales",
+      "Permite manejo arbitrario del tiempo",
+      "Ayuda a estudiar sistemas inexistentes",
+      "Permite estudiar sistemas estocásticos",
+      "Puede ser usado repetidamente una vez construido",
+      "Siempre encuentra la solución óptima"
+    ],
+    answer: [0,1,2,3,4,5,6],
+    feedback: "Todas son ventajas excepto 'siempre encuentra la solución óptima', que es una desventaja/limitación: la simulación solo evalúa posibles soluciones, no garantiza el óptimo."
+  },
+  {
+    q: "¿Cuáles son desventajas de la simulación?",
+    type: "checkbox",
+    options: [
+      "Costos económicos y en tiempo",
+      "Puede aparentar reflejar con precisión un sistema real cuando en verdad no lo hace",
+      "No podemos medir el grado de imprecisión",
+      "No sirven para encontrar soluciones óptimas",
+      "No es sustituto de un análisis detallado",
+      "Permite estudiar sistemas estocásticos"
+    ],
+    answer: [0,1,2,3,4],
+    feedback: "Las desventajas son: costos, falsa apariencia de precisión, imposibilidad de medir imprecisión, incapacidad de encontrar óptimos y no sustituye análisis detallado. 'Permite estudiar sistemas estocásticos' es una ventaja."
+  },
+  {
+    q: "¿Cuáles son peligros de la simulación?",
+    type: "checkbox",
+    options: [
+      "Inferir resultados con una sola corrida asumiendo independencia",
+      "Uso arbitrario de distribuciones y suposiciones",
+      "Impresionarse con el volumen de información sin que refleje el sistema",
+      "Los resultados pueden dar lugar a una excesiva confianza",
+      "Ignorar factores tecnológicos y de índole humana",
+      "Basar decisiones en el promedio cuando los resultados son cíclicos",
+      "Usar demasiadas réplicas independientes"
+    ],
+    answer: [0,1,2,3,4,5],
+    feedback: "Los peligros listados en el material son los primeros seis. 'Usar demasiadas réplicas' no es un peligro mencionado."
+  },
+  {
+    q: "¿Cuáles son características de las simulaciones terminantes?",
+    type: "checkbox",
+    options: [
+      "Por lo general no alcanzan un estado estable",
+      "Hay un evento natural que determina el tiempo de simulación",
+      "Suelen alcanzar un estado estable o 'en régimen'",
+      "Ejemplo: oficina con horarios de apertura y cierre",
+      "Ejemplo: central telefónica"
+    ],
+    answer: [0,1,3],
+    feedback: "Las simulaciones terminantes no alcanzan estado estable y tienen un evento natural que las termina (ej: cierre de una oficina). La central telefónica y el estado estable corresponden a simulaciones NO terminantes."
+  },
+  {
+    q: "¿Cuáles son características de las simulaciones NO terminantes?",
+    type: "checkbox",
+    options: [
+      "Sistemas cuya vida se prolonga en el tiempo",
+      "Suelen alcanzar un estado estable o 'en régimen'",
+      "Al inicio presentan un estado transitorio (Warm-Up)",
+      "Ejemplo: líneas de ensamblaje o producción continua",
+      "Ejemplo: confrontación militar que termina al perder el 30% de la fuerza"
+    ],
+    answer: [0,1,2,3],
+    feedback: "Las NO terminantes: se prolongan, alcanzan estado estable, tienen Warm-Up, y ejemplos como centrales telefónicas o líneas de ensamblaje. La confrontación militar es un ejemplo de simulación terminante."
+  },
+  {
+    q: "¿Cuáles son métodos para suprimir el estado transitorio (Warm-Up)?",
+    type: "checkbox",
+    options: [
+      "Corridas prolongadas",
+      "Inicialización adecuada",
+      "Truncamiento",
+      "Eliminación de datos iniciales (medias globales)",
+      "Traslado de medias de replicaciones independientes",
+      "Medias de tandas",
+      "Aumentar el nivel de confianza"
+    ],
+    answer: [0,1,2,3,4,5],
+    feedback: "El material lista 6 métodos de supresión del estado transitorio. 'Aumentar el nivel de confianza' no es uno de ellos."
+  },
+  {
+    q: "En el intervalo de confianza, para una muestra pequeña (N < 30) con distribución normal, ¿qué fórmula se usa?",
+    type: "radio",
+    options: [
+      "X̄ ± Zc · σ/√N",
+      "X̄ ± tc · σ/√(N−1)",
+      "X̄ ± tc · s/√N",
+      "n = (σ·Zα/2 / ε)²"
+    ],
+    answer: [1],
+    feedback: "Para muestras pequeñas (N < 30) se usa la distribución t: X̄ ± tc · σ/√(N−1). Para muestras grandes (N ≥ 30) se usa Z: X̄ ± Zc · σ/√N."
+  },
+  {
+    q: "¿Cuáles son las etapas del proceso de simulación?",
+    type: "checkbox",
+    options: [
+      "Definición del problema",
+      "Formulación y construcción del modelo",
+      "Adquisición y preparación de datos",
+      "Traslación / programación del modelo",
+      "Validación",
+      "Planeación táctica y estratégica",
+      "Experimentación",
+      "Interpretación y análisis de resultados",
+      "Implantación",
+      "Documentación",
+      "Marketing del modelo"
+    ],
+    answer: [0,1,2,3,4,5,6,7,8,9],
+    feedback: "Las 10 etapas del proceso de simulación son las primeras 10 opciones. 'Marketing del modelo' no es una etapa del proceso."
+  }
+];
+
+let answered = 0;
+let score = 0;
+const total = questions.length;
+
+function buildQuiz() {
+  const container = document.getElementById('quiz');
+  questions.forEach((q, i) => {
+    const card = document.createElement('div');
+    card.className = 'question-card';
+    card.id = `q${i}`;
+
+    const inputType = q.type === 'checkbox' ? 'checkbox' : 'radio';
+    const optionsHTML = q.options.map((opt, j) => `
+      <label class="option" id="opt-${i}-${j}">
+        <input type="${inputType}" name="q${i}" value="${j}">
+        <span>${opt}</span>
+      </label>
+    `).join('');
+
+    card.innerHTML = `
+      <div class="q-number">Pregunta ${i+1} / ${total} ${q.type === 'checkbox' ? '· múltiple opción' : ''}</div>
+      <div class="q-text">${q.q}</div>
+      <div class="options" id="opts-${i}">${optionsHTML}</div>
+      <div class="feedback" id="fb-${i}"></div>
+      <button class="btn-check" onclick="checkAnswer(${i})" id="btn-${i}">Verificar</button>
+    `;
+    container.appendChild(card);
+  });
+  updateUI();
+}
+
+function checkAnswer(i) {
+  const q = questions[i];
+  const inputs = document.querySelectorAll(`input[name="q${i}"]`);
+  const selected = [];
+  inputs.forEach((inp, j) => { if (inp.checked) selected.push(j); });
+
+  if (selected.length === 0) return;
+
+  const correct = q.answer;
+  const isCorrect = arraysEqual(selected.sort(), correct.sort());
+
+  // Reveal colors
+  q.options.forEach((_, j) => {
+    const label = document.getElementById(`opt-${i}-${j}`);
+    if (correct.includes(j) && selected.includes(j)) label.classList.add('correct');
+    else if (selected.includes(j) && !correct.includes(j)) label.classList.add('wrong');
+    else if (correct.includes(j)) label.classList.add('reveal-correct');
+  });
+
+  const fb = document.getElementById(`fb-${i}`);
+  fb.textContent = (isCorrect ? '✓ Correcto — ' : '✗ Incorrecto — ') + q.feedback;
+  fb.className = 'feedback show ' + (isCorrect ? 'ok' : 'err');
+
+  document.getElementById(`btn-${i}`).disabled = true;
+  inputs.forEach(inp => inp.disabled = true);
+
+  if (isCorrect) score++;
+  answered++;
+  updateUI();
+
+  if (answered === total) showResults();
+}
+
+function arraysEqual(a, b) {
+  return a.length === b.length && a.every((v, i) => v === b[i]);
+}
+
+function updateUI() {
+  document.getElementById('progressFill').style.width = (answered / total * 100) + '%';
+  document.getElementById('counterText').textContent = `Pregunta ${answered} / ${total} verificadas`;
+  document.getElementById('scoreText').textContent = `Puntaje: ${score} / ${total}`;
+}
+
+function showResults() {
+  const res = document.getElementById('results');
+  res.classList.add('show');
+  document.getElementById('finalScore').textContent = `${score} / ${total}`;
+  const pct = Math.round(score / total * 100);
+  let msg = pct >= 80 ? '¡Excelente! Dominás los conceptos de la Unidad 1.' :
+            pct >= 60 ? 'Bien, pero hay algunos conceptos para repasar.' :
+            'Te recomendamos repasar el material de la Unidad 1.';
+  document.getElementById('finalMsg').textContent = msg;
+  res.scrollIntoView({ behavior: 'smooth' });
+}
+
+buildQuiz();
+</script>
+</body>
+</html>
