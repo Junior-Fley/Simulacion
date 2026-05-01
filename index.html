@@ -271,6 +271,122 @@
 
 <script>
 const questions = [
+ {
+    q: "Marque cuáles son los aspectos NEGATIVOS de los Lenguajes de Propósitos Generales",
+    type: "checkbox",
+    options: [
+      "Costo del software",
+      "Poco conocimiento del lenguaje",
+      "Se necesita gestionar la recopilación y despliegue de los datos producidos",
+      "Es más laboriosa la administración y asignación de recursos de la computadora, durante la corrida",
+      "Es más laboriosa la generación de datos necesarios para la simulación",
+      "Limitada flexibilidad para adaptarse a cualquier modelo",
+      "Poca diversidad en el formato de salida",
+      "Tiempo de ejecución incrementado",
+      "Es necesario desarrollar las funcionalidades requeridas para construir un modelo"
+    ],
+    answer: [2, 3, 4, 8],
+    feedback: "Aspectos negativos marcados correctamente."
+  },
+  {
+    q: "Acerca de la Validación del modelo... Se deben validar varios puntos claves del modelo construido:",
+    type: "checkbox",
+    options: [
+      "Verificación de Supuestos (se debe involucrar al cliente)",
+      "Valores de Entrada",
+      "Valores de Salida"
+    ],
+    answer: [0, 1, 2],
+    feedback: "Son verdaderos los tres puntos."
+  },
+  {
+    q: "Técnicas de Validación: 'Intuición de experto', que se refiere a:",
+    type: "checkbox",
+    options: [
+      "Alguien que conozca el modelo real",
+      "Mediciones en el sistema real",
+      "Resultados teóricos"
+    ],
+    answer: [0, 1, 2],
+    feedback: "Aplica a todas estas técnicas."
+  },
+  {
+    q: "¿Cuál o cuáles de estos parámetros de variables estadísticas pueden tomar eventualmente valores negativos?",
+    type: "checkbox",
+    options: [
+      "Media de una distribución Exponencial Negativa",
+      "Límite inferior de una distribución Uniforme (0,1)",
+      "Límites inferior y superior de una distribución Uniforme (a,b)",
+      "Media de una distribución de Poisson",
+      "Media de una distribución Normal (No Estándar)",
+      "Media de una distribución Normal Estándar",
+      "Desviación de una distribución Normal Estándar",
+      "Desviación de una distribución Normal (No Estándar)",
+      "Límite inferior de una distribución Uniforme (a,b)",
+      "Lambda de una distribución Exponencial Negativa"
+    ],
+    answer: [2, 4, 8],
+    feedback: "Pueden ser negativos: Límites de una Uniforme (a,b) y la Media de una distribución Normal No Estándar."
+  },
+  {
+    q: "Marque cuáles son los aspectos POSITIVOS de los Lenguajes de Propósitos Generales",
+    type: "checkbox",
+    options: [
+      "Control de la administración y asignación de recursos de la computadora, durante la corrida",
+      "Por lo general se conoce muy bien el lenguaje",
+      "Flexibilidad para adaptarse a cualquier modelo",
+      "Menor costo del software",
+      "No hay restricciones para el formato de salida",
+      "Generación automática de ciertos datos necesarios",
+      "Recopilación y despliegue de los datos producidos",
+      "Tiempo de ejecución reducido",
+      "Brindan la mayoría de las funcionalidades necesarias para construir un modelo"
+    ],
+    answer: [1, 2, 3, 4, 7],
+    feedback: "Se rescatan su conocimiento previo, flexibilidad, menor costo y tiempo de corrida reducido."
+  },
+  {
+    q: "Marque cuáles son las DESVENTAJAS de la Simulación",
+    type: "checkbox",
+    options: [
+      "No se puede medir el grado de imprecisión",
+      "Puede aparentar reflejar con precisión un sistema real, cuando en verdad no lo hace",
+      "Falta de control sobre condiciones de entorno y de entrada",
+      "No es útil para la estimación de medidas de desempeño, bajo diferentes escenarios",
+      "No permite encontrar soluciones óptimas",
+      "No es apropiada para el estudio de sistemas estocásticos",
+      "No siempre es conveniente desde la perspectiva de los costos (económicos y en tiempo)",
+      "No es sustituto de un análisis detallado"
+    ],
+    answer: [0, 1, 4, 6, 7],
+    feedback: "No sustituye el análisis, aparenta falsamente el sistema real y no haya soluciones óptimas analíticas, entre otras."
+  },
+  {
+    q: "Mencione las ventajas de los lenguajes de simulación respecto de los lenguajes de propósitos generales",
+    type: "checkbox",
+    options: [
+      "Proveen la mayoría de las funcionalidades necesarias para construir un modelo",
+      "Generan automáticamente ciertos datos necesarios",
+      "Facilitan la recopilación y despliegue de los datos producidos",
+      "Controlan la administración y asignación del almacenamiento de la computadora durante la corrida"
+    ],
+    answer: [0, 1, 2, 3],
+    feedback: "Todas son ventajas integradas en dichos lenguajes."
+  },
+  {
+    q: "Indique cuáles son los peligros de la simulación",
+    type: "checkbox",
+    options: [
+      "Inferir resultados con una sola corrida",
+      "Uso arbitrario de distribuciones y suposiciones",
+      "Gran volumen de información que no refleja el sistema real",
+      "Resultados que generan excesiva confianza",
+      "Ignorar factores tecnológicos y humanos",
+      "Basarse solo en promedios estadísticos cuando los resultados son cíclicos"
+    ],
+    answer: [0, 1, 2, 3, 4, 5],
+    feedback: "Estos 6 puntos corresponden a los clásicos peligros de la simulación."
+  },
   {
     q: "¿Qué es un modelo?",
     type: "radio",
